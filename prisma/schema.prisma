@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            String         @id @default(cuid())
+  internal_id   Int            @unique @default(autoincrement())
+  name          String
+  email         String
+  avatar        String?
+  country       String?
+  city          String?
+  mini_bio      String?
+  bio           String?
+  main_language String?
+  languages     String[]
+  abilities     String[]
+  answers       Answers[]
+  raitings      OrderRaiting[]
+  orders        Orders[]
+  portfolio     Projects[]
+  created_at    DateTime       @default(now())
+}
+
+model Orders {
+  id            String         @id @default(cuid())
+  internal_id   Int            @unique @default(autoincrement())
+  user          Users          @relation(fields: [user_id], references: [internal_id])
+  user_id       Int
+  title         String
+  price         Decimal
+  description   String
+  main_language String
+  tags          String[]
+  languages     String[]
+  files         String[]
+  raiting       OrderRaiting[]
+  answers       Answers[]
+  completed     Boolean?
+  expire_at     DateTime?
+  created_at    DateTime       @default(now())
+}
+
+model Projects {
+  id      Int    @unique @default(autoincrement())
+  user    Users  @relation(fields: [user_id], references: [internal_id])
+  user_id Int
+  title   String
+  url     String
+}
+
+model Answers {
+  id       Int      @id @default(autoincrement())
+  user     Users?   @relation(fields: [user_id], references: [internal_id])
+  user_id  Int
+  order    Orders?  @relation(fields: [order_id], references: [internal_id])
+  order_id Int
+  answer   String
+  files    String[]
+}
+
+model OrderRaiting {
+  id          Int     @id @default(autoincrement())
+  user        Users?  @relation(fields: [user_id], references: [internal_id])
+  user_id     Int
+  order       Orders? @relation(fields: [order_id], references: [internal_id])
+  order_id    Int
+  stars     Int
+  description String
+}
